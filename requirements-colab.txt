@@ -5,8 +5,7 @@ trl>=0.9.6
 accelerate>=0.33.0
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
-scispacy>=0.5.4
-spacy>=3.7.0
+spacy>=3.7.4,<3.8.0
 rouge-score>=0.1.2
 pydantic>=2.7.0
 tqdm>=4.66.0
@@ -32,6 +31,18 @@ scipy>=1.11.0
 # does not exist"), which then breaks the transformers/peft import chain
 # entirely. Colab's preinstalled torch is already CUDA-matched to the VM and
 # always satisfies >=2.2.0, so just leave it alone here.
+#
+# scispacy is deliberately NOT listed either, same reasoning as
+# requirements.txt: reward.py only ever does spacy.load("en_core_sci_sm"),
+# never `import scispacy`, and that model's own metadata depends on plain
+# spacy, not the scispacy package. scispacy's PyPI metadata pins numpy<2.0,
+# and under `pip install -U` that downgrades numpy out from under every
+# other compiled package already linked against numpy 2.x's ABI in Colab's
+# environment -- "numpy.dtype size changed, may indicate binary
+# incompatibility" at import time, even in notebooks that never touch
+# scispacy at all (this setup cell is shared across all 7). spacy is capped
+# at <3.8.0 to match what the pinned en_core_sci_sm==0.5.4 model (installed
+# separately in notebook 01) actually supports.
 #
 # Use requirements.txt (the full one) only on your local machine, when you're
 # actually running agents.py against the served model.

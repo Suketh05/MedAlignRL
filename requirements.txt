@@ -6,8 +6,7 @@ trl>=0.9.6
 accelerate>=0.33.0
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
-scispacy>=0.5.4
-spacy>=3.7.0
+spacy>=3.7.4,<3.8.0
 rouge-score>=0.1.2
 pydantic>=2.7.0
 sglang>=0.2.13
@@ -19,3 +18,11 @@ scipy>=1.11.0
 # sglang needs jsonschema, which is why it's here even though nothing else
 # imports it directly. The Colab notebooks use requirements-colab.txt instead
 # (a trimmed list, no sglang) -- see that file's comment for why.
+#
+# scispacy is deliberately NOT listed: reward.py only ever does
+# spacy.load("en_core_sci_sm"), never `import scispacy`, and the
+# en_core_sci_sm model tarball's own metadata depends on plain spacy
+# (<3.8.0,>=3.7.4), not the scispacy package. Pulling in scispacy anyway
+# drags along its numpy<2.0 pin for no reason -- see requirements-colab.txt's
+# comment for the breakage that caused. spacy itself is capped at <3.8.0 to
+# match what the pinned en_core_sci_sm==0.5.4 model actually supports.
