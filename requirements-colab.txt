@@ -1,8 +1,8 @@
-transformers>=4.44.0
+transformers==4.57.6
 datasets>=2.20.0
-peft>=0.12.0
-trl>=0.9.6
-accelerate>=0.33.0
+peft==0.17.1
+trl==0.24.0
+accelerate==1.10.1
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
 spacy>=3.7.4,<3.8.0
@@ -31,6 +31,18 @@ scipy>=1.11.0
 # does not exist"), which then breaks the transformers/peft import chain
 # entirely. Colab's preinstalled torch is already CUDA-matched to the VM and
 # always satisfies >=2.2.0, so just leave it alone here.
+#
+# transformers, peft, trl, and accelerate are pinned to exact versions
+# (verified working together) instead of floors. Colab's base image ships
+# pre-release builds of trl/transformers with version numbers HIGHER than
+# anything ever published to PyPI (e.g. trl reporting 1.10.0 when 0.24.0 is
+# the actual latest PyPI release) specifically so plain `pip install -U`
+# never replaces them -- -U only installs a version newer than what's
+# already there, and nothing on PyPI outranks Colab's inflated preinstalled
+# version. That stale build's DPOConfig doesn't accept max_prompt_length as
+# a keyword arg, breaking train_dpo.py. An exact `==` pin forces pip to
+# install that specific version regardless of whether the installed one
+# looks newer by version number, which floors can't do.
 #
 # scispacy is deliberately NOT listed either, same reasoning as
 # requirements.txt: reward.py only ever does spacy.load("en_core_sci_sm"),
