@@ -1,0 +1,11 @@
+data/*.jsonl
+data/rag_index/
+outputs/*
+!outputs/.gitkeep
+!outputs/eval_results.json
+!outputs/human_eval_sheet.csv
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
+.env

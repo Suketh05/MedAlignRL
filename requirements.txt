@@ -1,0 +1,21 @@
+torch>=2.2.0
+transformers>=4.44.0
+datasets>=2.20.0
+peft>=0.12.0
+trl>=0.9.6
+accelerate>=0.33.0
+sentence-transformers>=3.0.0
+faiss-cpu>=1.8.0
+scispacy>=0.5.4
+spacy>=3.7.0
+rouge-score>=0.1.2
+pydantic>=2.7.0
+sglang>=0.2.13
+jsonschema>=4.22.0
+tqdm>=4.66.0
+scipy>=1.11.0
+
+# Note: this is the full list, needed on your local PC to run agents.py.
+# sglang needs jsonschema, which is why it's here even though nothing else
+# imports it directly. The Colab notebooks use requirements-colab.txt instead
+# (a trimmed list, no sglang) -- see that file's comment for why.

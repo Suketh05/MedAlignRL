@@ -1,0 +1,27 @@
+torch>=2.2.0
+transformers>=4.44.0
+datasets>=2.20.0
+peft>=0.12.0
+trl>=0.9.6
+accelerate>=0.33.0
+sentence-transformers>=3.0.0
+faiss-cpu>=1.8.0
+spacy>=3.7.0
+rouge-score>=0.1.2
+pydantic>=2.7.0
+tqdm>=4.66.0
+scipy>=1.11.0
+
+# NOTE: sglang, jsonschema, and bitsandbytes are deliberately left out of this
+# file. sglang (and jsonschema, which it needs) are only used by agents.py,
+# which never runs in Colab -- that script runs on your local machine against
+# the merged model, per the split-workflow design. bitsandbytes was in the
+# original requirements.txt for 4-bit loading but nothing in this codebase
+# actually wires that up, so it's dead weight either way. Same story for
+# pandas and pyyaml, also dropped here -- nothing in src/ imports either one.
+# Installing sglang's full dependency tree in every Colab notebook for a
+# script that never runs there was the single biggest thing slowing down
+# every setup cell.
+#
+# Use requirements.txt (the full one) only on your local machine, when you're
+# actually running agents.py against the served model.
