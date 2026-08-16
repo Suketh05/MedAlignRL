@@ -27,7 +27,12 @@ def _get_nlp():
             _nlp = spacy.load(model_name)
             print(f"Loaded NER model: {model_name}")
             return _nlp
-        except OSError:
+        except Exception as e:  # noqa: BLE001
+            # Not just OSError ("model missing") -- en_core_sci_sm is
+            # installed --no-deps against a spacy version newer than it
+            # declares support for, so a genuine incompatibility would
+            # surface as something other than OSError.
+            print(f"Failed to load {model_name}: {e}")
             continue
     raise RuntimeError(
         "No NER model available. Run: python -m spacy download en_core_web_sm"

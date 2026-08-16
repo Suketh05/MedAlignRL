@@ -6,7 +6,7 @@ trl>=0.9.6
 accelerate>=0.33.0
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
-spacy>=3.7.4,<3.8.0
+spacy>=3.7.4
 rouge-score>=0.1.2
 pydantic>=2.7.0
 sglang>=0.2.13
@@ -24,5 +24,12 @@ scipy>=1.11.0
 # en_core_sci_sm model tarball's own metadata depends on plain spacy
 # (<3.8.0,>=3.7.4), not the scispacy package. Pulling in scispacy anyway
 # drags along its numpy<2.0 pin for no reason -- see requirements-colab.txt's
-# comment for the breakage that caused. spacy itself is capped at <3.8.0 to
-# match what the pinned en_core_sci_sm==0.5.4 model actually supports.
+# comment for the breakage that caused.
+#
+# spacy is intentionally left UNCAPPED despite en_core_sci_sm declaring
+# <3.8.0: that cap itself forces thinc<8.3.0, which forces numpy<2.0 --
+# the same class of breakage scispacy caused, just one dependency hop over.
+# The model is installed with --no-deps (see notebook 01) so it can't force
+# that downgrade; reward.py's NER loader catches any load failure (not just
+# "model missing") and falls back to en_core_web_sm if the cross-minor-
+# version load ever actually breaks rather than just warning.
