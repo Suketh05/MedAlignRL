@@ -6,6 +6,7 @@ trl>=0.9.6
 accelerate>=0.33.0
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
+scispacy>=0.5.4
 spacy>=3.7.0
 rouge-score>=0.1.2
 pydantic>=2.7.0

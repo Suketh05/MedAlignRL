@@ -30,5 +30,5 @@ public, you can skip the token entirely -- the same cell falls back to a
 plain clone.
 
 If you're re-running any of these later with a different model or dataset
-config, edit `src/config.py` in your GitHub repo and push -- the next
-`git pull` in the setup cell picks it up automatically.
+config, edit `src/config.py` in your GitHub repo and push -- the next setup
+cell's `git fetch` + hard reset picks it up automatically.
