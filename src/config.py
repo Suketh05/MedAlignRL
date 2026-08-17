@@ -52,8 +52,8 @@ class Config:
     dpo_beta: float = 0.1
     learning_rate: float = 5e-5
     num_train_epochs: int = 2
-    per_device_train_batch_size: int = 2
-    gradient_accumulation_steps: int = 8
+    per_device_train_batch_size: int = 1
+    gradient_accumulation_steps: int = 16
 
     # ---- Verifier / refiner loop ----
     verifier_score_threshold: float = 0.6

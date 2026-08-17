@@ -37,8 +37,7 @@ def build_sft_examples(tokenizer):
 
 def tokenize_fn(tokenizer):
     def _fn(batch):
-        return tokenizer(batch["text"], truncation=True, max_length=CFG.max_seq_len,
-                          padding="max_length")
+        return tokenizer(batch["text"], truncation=True, max_length=CFG.max_seq_len)
     return _fn
 
 
@@ -58,6 +57,7 @@ def main():
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj"], task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, peft_config)
+    model.enable_input_require_grads()  # needed so gradient checkpointing works through frozen base + LoRA
 
     ds = build_sft_examples(tokenizer)
     ds = ds.map(tokenize_fn(tokenizer), batched=True, remove_columns=["text"])
@@ -72,6 +72,8 @@ def main():
         logging_steps=10,
         save_strategy="epoch",
         bf16=(device == "cuda"),
+        gradient_checkpointing=(device == "cuda"),
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         report_to=[],
     )
     collator = DataCollatorForLanguageModeling(tokenizer, mlm=False)
