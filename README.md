@@ -68,7 +68,7 @@ It is still a legitimate member of the RLHF family (RLHF-without-a-critic).
 | `src/agents.py` | The multi-agent pipeline (retriever → drafter → verifier → refiner) via SGLang |
 | `src/evaluate.py` | ROUGE-L, entity-F1, malformed-output rate, fact-consistency — base vs. SFT vs. DPO-tuned, on both eval sets |
 | `src/human_eval.py` | Generates a rating sheet for a human reviewer, then computes correlation between their 1–5 scores and the automated reward — this is what "correlation with expert judgment" actually requires |
-| `notebooks/` | Seven standalone, resumable Colab notebooks — see `notebooks/README.md` for the run order |
+| `notebooks/` | Six standalone, resumable Colab notebooks — see `notebooks/README.md` for the run order |
 
 ## Positioning: why build this, given adjacent work exists
 
@@ -175,7 +175,7 @@ python src/agents.py --dialogue "Doctor: ... Patient: ..."
 ```
 
 Or open `notebooks/01_setup_data_and_rag.ipynb` in Colab and work through
-the seven notebooks in order — see `notebooks/README.md` for what each one
+the six notebooks in order — see `notebooks/README.md` for what each one
 produces and roughly how long it takes. They're split up deliberately so a
 Colab disconnect partway through doesn't cost you the whole run; each one
 mounts Google Drive and picks up wherever the last one left off.

@@ -5,7 +5,7 @@ split up on purpose -- Colab sessions time out or disconnect, and losing
 three hours of preference-pair generation because the eval step crashed at
 the end is not a fun way to spend a day.
 
-All seven mount Google Drive and clone/pull the repo into
+All six mount Google Drive and clone/pull the repo into
 `/content/drive/MyDrive/MedAlignRL`, so anything a notebook produces
 (datasets, indices, checkpoints) is still there the next time you open a
 different one, even in a fresh runtime.
@@ -17,8 +17,13 @@ different one, even in a fresh runtime.
 | 3 | `03_train_sft_baseline.ipynb` | `outputs/sft_model/` | ~5-10 min |
 | 4 | `04_train_dpo.ipynb` | `outputs/dpo_model/` | ~5-10 min |
 | 5 | `05_evaluate.ipynb` | `outputs/eval_results.json` | ~30-40 min |
-| 6 | `06_human_eval.ipynb` | `outputs/human_eval_sheet.csv` | ~2 min + however long rating takes |
-| 7 | `07_merge_and_export.ipynb` | `outputs/dpo_model_merged/`, pushed to HF or downloaded | ~10 min |
+| 6 | `06_merge_export_and_human_eval.ipynb` | `outputs/dpo_model_merged/` (pushed to HF or downloaded), `outputs/human_eval_sheet.csv`, results pushed to GitHub | ~15 min + however long rating takes |
+
+Notebook 6 merges weights, (optionally) exports the model, and runs human
+eval, in that order in a single notebook -- human eval needs the merged
+model that the same notebook's first step produces, so splitting them
+across two separate Colab sessions just meant always having to remember to
+run one before the other.
 
 Before running notebook 1: push your code to GitHub (a private repo is
 fine at this stage -- nothing about training requires it to be public yet).
