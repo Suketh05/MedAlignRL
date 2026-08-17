@@ -22,8 +22,9 @@ from rag import Retriever
 from reward import composite_reward
 
 PROMPT_TEMPLATE = """You are a clinical scribe. Summarize the following doctor-patient \
-dialogue into a structured clinical note with sections: Chief Complaint, \
-History of Present Illness, Assessment, Plan. Only include facts stated in the dialogue.
+dialogue into a structured clinical note as JSON with keys: chief_complaint, \
+history_of_present_illness, assessment, plan, medications_mentioned. \
+Only include facts stated in the dialogue.
 
 Similar example dialogue and note (for reference only, do not copy facts from it):
 ---
@@ -34,7 +35,7 @@ Note: {ex_summary}
 Now summarize this dialogue:
 {dialogue}
 
-Structured note:"""
+JSON note:"""
 
 
 def build_prompt(dialogue: str, retriever: Retriever) -> str:
@@ -90,10 +91,24 @@ def main(n_candidates: int, n_examples: int):
     tokenizer = AutoTokenizer.from_pretrained(CFG.model_name)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(
-        CFG.model_name,
-        torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
-    ).to(device)
+
+    sft_path = os.path.join(CFG.output_dir, "sft_model")
+    if os.path.exists(sft_path):
+        print(f"Sampling candidates from the SFT checkpoint: {sft_path}")
+        from peft import PeftModel
+        base = AutoModelForCausalLM.from_pretrained(
+            CFG.model_name,
+            torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
+        )
+        model = PeftModel.from_pretrained(base, sft_path).merge_and_unload().to(device)
+    else:
+        print("No SFT checkpoint found -- sampling candidates from the base model directly. "
+              "Run train_sft.py first so DPO preference pairs match the style DPO training "
+              "will actually start from.")
+        model = AutoModelForCausalLM.from_pretrained(
+            CFG.model_name,
+            torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
+        ).to(device)
     model.eval()
 
     retriever = Retriever()

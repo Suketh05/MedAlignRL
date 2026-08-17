@@ -11,7 +11,7 @@ from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 
 from config import CFG
-from data import load_split
+from data import load_split, row_to_clinical_note_json
 
 PROMPT_TEMPLATE = """You are a clinical scribe. Summarize the following doctor-patient \
 dialogue into a structured clinical note as JSON with keys: chief_complaint, \
@@ -29,9 +29,8 @@ def build_sft_examples(tokenizer):
     texts = []
     for ex in train:
         prompt = PROMPT_TEMPLATE.format(dialogue=ex["dialogue"])
-        # Target is the raw reference summary text (not schema-perfect JSON --
-        # that's fine, SFT is meant to be the weaker baseline the bullet compares against).
-        full = prompt + " " + ex["summary"] + tokenizer.eos_token
+        target = row_to_clinical_note_json(ex.get("section_header", ""), ex["summary"])
+        full = prompt + " " + target + tokenizer.eos_token
         texts.append(full)
     return Dataset.from_dict({"text": texts})
 

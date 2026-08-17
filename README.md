@@ -149,11 +149,11 @@ python -m spacy download en_core_web_sm   # NER fallback if scispaCy unavailable
 python src/data.py
 python src/rag.py --build-index
 
-# 2. Generate preference pairs with the composite reward
-python src/preference_pairs.py --n-candidates 4 --n-examples 300
-
-# 3. Supervised fine-tuning baseline (the "supervised baseline" the RLHF stage compares against)
+# 2. Supervised fine-tuning baseline (the "supervised baseline" the RLHF stage compares against)
 python src/train_sft.py
+
+# 3. Generate preference pairs with the composite reward (samples from the SFT checkpoint)
+python src/preference_pairs.py --n-candidates 4 --n-examples 300
 
 # 4. DPO fine-tune (LoRA, starts from the SFT checkpoint)
 python src/train_dpo.py

@@ -13,11 +13,16 @@ different one, even in a fresh runtime.
 | # | Notebook | Produces | Rough time (A100) |
 |---|---|---|---|
 | 1 | `01_setup_data_and_rag.ipynb` | `data/*.jsonl`, `data/rag_index/` | ~10 min |
-| 2 | `02_generate_preference_pairs.ipynb` | `data/preference_pairs.jsonl` | ~45-60 min |
-| 3 | `03_train_sft_baseline.ipynb` | `outputs/sft_model/` | ~5-10 min |
+| 2 | `02_train_sft_baseline.ipynb` | `outputs/sft_model/` | ~5-10 min |
+| 3 | `03_generate_preference_pairs.ipynb` | `data/preference_pairs.jsonl` | ~45-60 min |
 | 4 | `04_train_dpo.ipynb` | `outputs/dpo_model/` | ~5-10 min |
 | 5 | `05_evaluate.ipynb` | `outputs/eval_results.json` | ~30-40 min |
 | 6 | `06_merge_export_and_human_eval.ipynb` | `outputs/dpo_model_merged/` (pushed to HF or downloaded), `outputs/human_eval_sheet.csv`, results pushed to GitHub | ~15 min + however long rating takes |
+
+SFT now runs *before* preference-pair generation: `preference_pairs.py` samples its
+DPO candidates from the SFT checkpoint (falling back to the base model with a
+warning if it isn't there yet), so the checkpoint has to exist first, or DPO training
+just drags the model back out of the style SFT taught it.
 
 Notebook 6 merges weights, (optionally) exports the model, and runs human
 eval, in that order in a single notebook -- human eval needs the merged

@@ -12,6 +12,7 @@ import random
 from datasets import load_dataset
 
 from config import CFG
+from schema import ClinicalNote
 
 CANDIDATE_DATASET_IDS = [
     "har1/MTS_Dialogue-Clinical_Note",
@@ -22,6 +23,7 @@ CANDIDATE_DATASET_IDS = [
 # Field-name candidates seen across MTS-Dialog mirrors.
 DIALOGUE_FIELDS = ["dialogue", "conversation", "text", "src"]
 SUMMARY_FIELDS = ["section_text", "summary", "note", "tgt"]
+HEADER_FIELDS = ["section_header", "header", "section"]
 
 
 def _first_present(row, candidates):
@@ -58,10 +60,12 @@ def build_splits():
         summary = _first_present(row, SUMMARY_FIELDS)
         if not dialogue or not summary:
             continue
+        header = _first_present(row, HEADER_FIELDS)
         examples.append({
             "id": f"{i}",
             "dialogue": dialogue.strip(),
             "summary": summary.strip(),
+            "section_header": header.strip() if header else "",
         })
 
     print(f"Loaded {len(examples)} usable examples from {ds_id}")
@@ -93,6 +97,70 @@ def load_split(name):
         build_splits()
     with open(path) as f:
         return [json.loads(line) for line in f]
+
+
+# ---------------------------------------------------------------------------
+# MTS-Dialog rows are single sections (one section_header + section_text),
+# not full notes -- so converting one to a ClinicalNote necessarily leaves
+# every field but the mapped one empty. Used by train_sft.py so its
+# fine-tuning target is schema-shaped JSON instead of raw section text,
+# matching what evaluate.py/human_eval.py actually prompt for.
+# ---------------------------------------------------------------------------
+
+# Exact section_header codes, as used by the primary MTS-Dialog mirror.
+_EXACT_HEADER_FIELD_MAP = {
+    "CC": "chief_complaint",
+    "GENHX": "history_of_present_illness",
+    "ASSESSMENT": "assessment",
+    "DIAGNOSIS": "assessment",
+    "PLAN": "plan",
+    "DISPOSITION": "plan",
+    "ALLERGY": "medications_mentioned",
+    "ALLERGIES": "medications_mentioned",
+    "MEDICATIONS": "medications_mentioned",
+}
+
+# Substring fallback for mirrors that spell headers out in full instead of
+# using the short codes above.
+_SUBSTRING_HEADER_FIELD_MAP = {
+    "CHIEF COMPLAINT": "chief_complaint",
+    "HISTORY OF PRESENT ILLNESS": "history_of_present_illness",
+    "IMPRESSION": "assessment",
+    "ASSESSMENT": "assessment",
+    "DIAGNOSIS": "assessment",
+    "DISPOSITION": "plan",
+    "PLAN": "plan",
+    "ALLERGY": "medications_mentioned",
+    "MEDICATION": "medications_mentioned",
+}
+
+
+def _map_header_to_field(section_header):
+    header = (section_header or "").strip().upper()
+    if not header:
+        return None
+    if header in _EXACT_HEADER_FIELD_MAP:
+        return _EXACT_HEADER_FIELD_MAP[header]
+    for keyword, field in _SUBSTRING_HEADER_FIELD_MAP.items():
+        if keyword in header:
+            return field
+    return None
+
+
+def row_to_clinical_note_json(section_header: str, section_text: str) -> str:
+    """Converts one MTS-Dialog (section_header, section_text) row into a
+    ClinicalNote-shaped JSON string."""
+    fields = {
+        "chief_complaint": "",
+        "history_of_present_illness": "",
+        "assessment": "",
+        "plan": "",
+        "medications_mentioned": "",
+    }
+    field = _map_header_to_field(section_header)
+    if field:
+        fields[field] = section_text.strip()
+    return ClinicalNote(**fields).model_dump_json()
 
 
 # ---------------------------------------------------------------------------
