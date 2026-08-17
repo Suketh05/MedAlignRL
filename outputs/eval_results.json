@@ -1,0 +1,56 @@
+{
+  "base": {
+    "mts_dialog_test": {
+      "label": "base/mts_dialog_test",
+      "rougeL": 0.17015250503977722,
+      "entity_f1": 0.18223632267487946,
+      "fact_consistency": 0.8068353415215097,
+      "malformed_rate": 1.0,
+      "n_examples": 50
+    },
+    "aci_bench_external": {
+      "label": "base/aci_bench_external",
+      "rougeL": 0.1571598829704672,
+      "entity_f1": 0.16224290720094806,
+      "fact_consistency": 0.9589509886713076,
+      "malformed_rate": 1.0,
+      "n_examples": 66
+    }
+  },
+  "sft_baseline": {
+    "mts_dialog_test": {
+      "label": "sft_baseline/mts_dialog_test",
+      "rougeL": 0.5785556464913661,
+      "entity_f1": 0.24309696329691677,
+      "fact_consistency": 0.8660656471284528,
+      "malformed_rate": 1.0,
+      "n_examples": 50
+    },
+    "aci_bench_external": {
+      "label": "sft_baseline/aci_bench_external",
+      "rougeL": 0.11248564486278528,
+      "entity_f1": 0.12656500445383534,
+      "fact_consistency": 0.9088062649384621,
+      "malformed_rate": 1.0,
+      "n_examples": 66
+    }
+  },
+  "dpo_tuned": {
+    "mts_dialog_test": {
+      "label": "dpo_tuned/mts_dialog_test",
+      "rougeL": 0.176923481437891,
+      "entity_f1": 0.1714445947014581,
+      "fact_consistency": 0.885779146792338,
+      "malformed_rate": 1.0,
+      "n_examples": 50
+    },
+    "aci_bench_external": {
+      "label": "dpo_tuned/aci_bench_external",
+      "rougeL": 0.1587438204472625,
+      "entity_f1": 0.17121636555473427,
+      "fact_consistency": 0.9594873322289046,
+      "malformed_rate": 1.0,
+      "n_examples": 66
+    }
+  }
+}
