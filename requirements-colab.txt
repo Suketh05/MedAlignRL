@@ -5,7 +5,7 @@ trl==0.24.0
 accelerate==1.10.1
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
-spacy>=3.7.4
+spacy==3.8.13
 rouge-score>=0.1.2
 pydantic>=2.7.0
 tqdm>=4.66.0
@@ -54,16 +54,27 @@ scipy>=1.11.0
 # incompatibility" at import time, even in notebooks that never touch
 # scispacy at all (this setup cell is shared across all 7).
 #
-# spacy is intentionally left UNCAPPED despite en_core_sci_sm declaring
-# <3.8.0: that cap forces thinc<8.3.0, which forces numpy<2.0 -- the exact
-# same class of breakage scispacy caused above, just one dependency hop
-# over (spacy<3.8 -> thinc<8.3 -> numpy<2.0). AllenAI has never shipped an
-# en_core_sci_sm build newer than 0.5.4 (spacy 3.7-era), so there's no
-# newer-model escape hatch. The model is installed with --no-deps in
-# notebook 01 so it can't force spacy back down; reward.py's NER loader
+# spacy is pinned exactly (like transformers/peft/trl/accelerate above),
+# not just uncapped, and to a version ABOVE what en_core_sci_sm declares
+# support for (<3.8.0): a floor alone (spacy>=3.7.4) still resolved to
+# Colab's already-installed 3.7.5 (kept around because Colab's own fastai
+# depends on it) even under `pip install -U` -- pip is allowed to satisfy a
+# floor with whatever's already present rather than the newest release.
+# That kept thinc on the 8.2.x line, which caps numpy<2.0, reproducing the
+# same "numpy.dtype size changed" ABI breakage scispacy caused, just one
+# dependency hop over (spacy<3.8 -> thinc<8.3 -> numpy<2.0) and inside
+# thinc's own compiled extension this time. An exact pin forces pip to
+# install that specific version regardless of what's already satisfying
+# the floor, same fix as the trl ghost-version issue above.
+#
+# AllenAI has never shipped an en_core_sci_sm build newer than 0.5.4
+# (spacy 3.7-era), so there's no newer-model escape hatch -- the model is
+# installed with --no-deps in notebook 01 so it can't force spacy back
+# down to satisfy its own declared cap. spaCy's model serialization format
+# has stayed stable across the 3.x line, so loading a 3.7-packaged model
+# under 3.8 should just emit an advisory warning; reward.py's NER loader
 # catches any load failure (not just "model missing") and falls back to
-# en_core_web_sm if loading the spacy-3.7-packaged model under a newer
-# spacy runtime ever actually breaks, rather than just prints a warning.
+# en_core_web_sm as a safety net if that assumption is ever wrong.
 #
 # Use requirements.txt (the full one) only on your local machine, when you're
 # actually running agents.py against the served model.

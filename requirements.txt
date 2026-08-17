@@ -6,7 +6,7 @@ trl>=0.9.6
 accelerate>=0.33.0
 sentence-transformers>=3.0.0
 faiss-cpu>=1.8.0
-spacy>=3.7.4
+spacy==3.8.13
 rouge-score>=0.1.2
 pydantic>=2.7.0
 sglang>=0.2.13
@@ -26,10 +26,14 @@ scipy>=1.11.0
 # drags along its numpy<2.0 pin for no reason -- see requirements-colab.txt's
 # comment for the breakage that caused.
 #
-# spacy is intentionally left UNCAPPED despite en_core_sci_sm declaring
-# <3.8.0: that cap itself forces thinc<8.3.0, which forces numpy<2.0 --
-# the same class of breakage scispacy caused, just one dependency hop over.
-# The model is installed with --no-deps (see notebook 01) so it can't force
-# that downgrade; reward.py's NER loader catches any load failure (not just
-# "model missing") and falls back to en_core_web_sm if the cross-minor-
-# version load ever actually breaks rather than just warning.
+# spacy is pinned exactly, not just uncapped, and to a version ABOVE what
+# en_core_sci_sm declares support for (<3.8.0): a floor alone (>=3.7.4)
+# let pip settle on an already-present older spacy rather than the newest
+# release, keeping thinc on the 8.2.x line, which caps numpy<2.0 -- the
+# same class of breakage scispacy caused, just one dependency hop over
+# (spacy<3.8 -> thinc<8.3 -> numpy<2.0). See requirements-colab.txt's
+# comment for the full story. The model is installed with --no-deps (see
+# notebook 01) so it can't force spacy back down; reward.py's NER loader
+# catches any load failure (not just "model missing") and falls back to
+# en_core_web_sm if the cross-minor-version load ever actually breaks
+# rather than just warning.
